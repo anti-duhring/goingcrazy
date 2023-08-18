@@ -1,16 +1,23 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/anti-duhring/goingcrazy/config"
+	"github.com/anti-duhring/goingcrazy/router"
+)
+
+var (
+	logger config.Logger
 )
 
 func main() {
-	r := gin.Default()
+	logger = *config.GetLogger("main")
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+	err := config.Init()
+	if err != nil {
+		logger.Errorf("Config initialization error: %v", err)
+
+		return
+	}
+
+	router.Initialize()
 }
