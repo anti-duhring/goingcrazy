@@ -6,6 +6,8 @@ import (
 )
 
 func initializeRoutes(r *gin.Engine) {
+	handler.InitializeHandler()
+
 	v1 := r.Group("/api/v1")
 	{
 		v1.POST("/pessoas", handler.CreatePersonHandler)

@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
 func CreatePersonHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Post person",
-	})
+	request := CreatePersonRequest{}
+
+	c.BindJSON(&request)
+
+	logger.Infof("Request received: %+v", request)
 }
