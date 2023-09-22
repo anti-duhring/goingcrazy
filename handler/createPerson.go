@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/anti-duhring/goingcrazy/schema"
 	"github.com/gin-gonic/gin"
@@ -13,10 +14,20 @@ func CreatePersonHandler(c *gin.Context) {
 
 	c.BindJSON(&request)
 
+	if err := request.Validate(); err != nil {
+		logger.Errorf("error validating request: %v", err.Error())
+
+		sendError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	stackJSON, err := json.Marshal(request.Stack)
 
 	if err != nil {
-		logger.Errorf("error marshalling stack: %v", err)
+		logger.Errorf("error marshalling stack: %v", err.Error())
+
+		sendError(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	person := schema.Person{
@@ -27,8 +38,9 @@ func CreatePersonHandler(c *gin.Context) {
 	}
 
 	if err := db.Create(&person).Error; err != nil {
-		logger.Errorf("error creating perso: %v", err)
+		logger.Errorf("error creating perso: %v", err.Error())
 
+		sendError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 }
