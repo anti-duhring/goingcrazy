@@ -43,4 +43,6 @@ func CreatePersonHandler(c *gin.Context) {
 		sendError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	sendSuccess(c, "create-person", person)
 }
