@@ -3,6 +3,8 @@ package handler
 import (
 	"fmt"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func errParamIsRequired(name, typ string) error {
@@ -24,14 +26,35 @@ func hasStringWithMaxLength(s []string, max int) bool {
 	return false
 }
 
-type CreatePersonRequest struct {
-	Apelido    string    `json:"apelido"`
-	Nome       string    `json:"nome"`
-	Nascimento time.Time `json:"nascimento"`
-	Stack      []string  `json:"stack"`
+type CustomTime struct {
+	time.Time
 }
 
-func (r *CreatePersonRequest) Validate() error {
+var dateFormat = "2006-01-02"
+
+func (ct CustomTime) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, ct.Format(dateFormat))), nil
+}
+
+func (ct *CustomTime) UnmarshalJSON(b []byte) error {
+	s := string(b)
+	t, err := time.Parse(dateFormat, s[1:len(s)-1]) // Remove quotes
+	if err != nil {
+		return err
+	}
+
+	*ct = CustomTime{t}
+	return nil
+}
+
+type CreatePersonRequest struct {
+	Apelido    string     `json:"apelido"`
+	Nome       string     `json:"nome"`
+	Nascimento CustomTime `json:"nascimento"`
+	Stack      []string   `json:"stack"`
+}
+
+func (r *CreatePersonRequest) Validate(c *gin.Context) error {
 	if r == nil {
 		return fmt.Errorf("malformed request body")
 	}

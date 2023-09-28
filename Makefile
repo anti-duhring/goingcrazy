@@ -1,13 +1,15 @@
-.PHONY: default run build test clean stop
+.PHONY: default start run build test clean stop
 
 # Variables
 APP_NAME=goingcrazy
 
 # Tasks
-default: run
+default: start
 
-run:
+start: 
 	@docker-compose up -d
+	@go run main.go
+run:
 	@go run main.go
 build:
 	@go build -o $(APP_NAME) main.go

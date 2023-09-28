@@ -6,18 +6,24 @@ import (
 
 	"github.com/anti-duhring/goingcrazy/schema"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gorm.io/datatypes"
 )
 
 func CreatePersonHandler(c *gin.Context) {
 	request := CreatePersonRequest{}
 
-	c.BindJSON(&request)
-
-	if err := request.Validate(); err != nil {
-		logger.Errorf("error validating request: %v", err.Error())
+	if err := c.BindJSON(&request); err != nil {
+		logger.Errorf("error binding json: %v", err.Error())
 
 		sendError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := request.Validate(c); err != nil {
+		logger.Errorf("error validating request: %v", err.Error())
+
+		sendError(c, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -33,7 +39,7 @@ func CreatePersonHandler(c *gin.Context) {
 	person := schema.Person{
 		Apelido:    request.Apelido,
 		Nome:       request.Nome,
-		Nascimento: datatypes.Date(request.Nascimento),
+		Nascimento: datatypes.Date(request.Nascimento.Time),
 		Stack:      stackJSON,
 	}
 
@@ -44,5 +50,10 @@ func CreatePersonHandler(c *gin.Context) {
 		return
 	}
 
-	sendSuccess(c, "create-person", person)
+	addLocationToHeader(c, person.ID)
+	sendSuccess(c, http.StatusCreated, "create-person", person)
+}
+
+func addLocationToHeader(c *gin.Context, id uuid.UUID) {
+	c.Header("Location", "/pessoas/"+id.String())
 }

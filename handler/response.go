@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/datatypes"
 )
 
 func sendError(c *gin.Context, code int, message string) {
@@ -11,10 +13,23 @@ func sendError(c *gin.Context, code int, message string) {
 	c.JSON(code, gin.H{"error": message, "status": code})
 }
 
-func sendSuccess(c *gin.Context, op string, data interface{}) {
+func sendSuccess(c *gin.Context, statusCode int, op string, data interface{}) {
 	c.Header("Content-Type", "application/json")
-	c.JSON(200, gin.H{
+	c.JSON(statusCode, gin.H{
 		"message": fmt.Sprintf("operation from handler: %s sucessfull", op),
 		"data":    data,
 	})
+}
+
+func sendSucessWithoutMessage(c *gin.Context, statusCode int, data interface{}) {
+	c.Header("Content-Type", "application/json")
+	c.JSON(statusCode, data)
+}
+
+type PersonResponse struct {
+	ID         uuid.UUID      `json:"id"`
+	Apelido    string         `json:"apelido"`
+	Nome       string         `json:"nome"`
+	Nascimento datatypes.Date `json:"nascimento"`
+	Stack      datatypes.JSON `json:"stack"`
 }

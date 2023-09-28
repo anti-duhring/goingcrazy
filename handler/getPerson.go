@@ -9,10 +9,10 @@ import (
 )
 
 func GetPersonHandler(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 
 	if id == "" {
-		sendError(c, http.StatusBadRequest, errParamIsRequired("id", "queryParam").Error())
+		sendError(c, http.StatusBadRequest, errParamIsRequired("id", "pathParam").Error())
 		return
 	}
 
@@ -23,5 +23,13 @@ func GetPersonHandler(c *gin.Context) {
 		return
 	}
 
-	sendSuccess(c, "get-person", person)
+	personResponse := PersonResponse{
+		ID:         person.ID,
+		Apelido:    person.Apelido,
+		Nome:       person.Nome,
+		Nascimento: person.Nascimento,
+		Stack:      person.Stack,
+	}
+
+	sendSucessWithoutMessage(c, http.StatusOK, personResponse)
 }

@@ -11,7 +11,9 @@ func initializeRoutes(r *gin.Engine) {
 	v1 := r.Group("/api/v1")
 	{
 		v1.POST("/pessoas", handler.CreatePersonHandler)
+		v1.GET("/pessoas/:id", handler.GetPersonHandler)
 		v1.GET("/pessoas", handler.GetPersonHandler)
 		v1.DELETE("/pessoas", handler.DeletePersonHandler)
+		v1.GET("/contagem-pessoas", handler.CountPersonHandler)
 	}
 }

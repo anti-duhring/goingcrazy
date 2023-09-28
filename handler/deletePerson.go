@@ -28,6 +28,6 @@ func DeletePersonHandler(c *gin.Context) {
 		return
 	}
 
-	sendSuccess(c, "delete-person", person)
+	sendSuccess(c, http.StatusOK, "delete-person", person)
 
 }
