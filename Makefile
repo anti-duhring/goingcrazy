@@ -2,6 +2,8 @@
 
 # Variables
 APP_NAME=goingcrazy
+OS=linux
+OS_ARCH=amd64
 
 # Tasks
 default: start
@@ -12,7 +14,7 @@ start:
 run:
 	@go run main.go
 build:
-	@go build -o $(APP_NAME) main.go
+	@env GOS=$(OS) GOARCH=$(OS_ARCH) go build -o $(APP_NAME) main.go
 test:
 	@go test ./ ...
 clean:

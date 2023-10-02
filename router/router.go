@@ -1,6 +1,10 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"os"
+
+	"github.com/gin-gonic/gin"
+)
 
 func Initialize() {
 	r := gin.Default()
@@ -12,5 +16,7 @@ func Initialize() {
 			"message": "pong",
 		})
 	})
-	r.Run(":8080")
+
+	port := os.Getenv("API_PORT")
+	r.Run(":" + port)
 }

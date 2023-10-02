@@ -13,5 +13,6 @@ func CountPersonHandler(c *gin.Context) {
 
 	db.Model(&schema.Person{}).Count(&count)
 
-	sendSuccess(c, http.StatusOK, "count-person", count)
+	c.Header("Content-Type", "text/plain")
+	c.String(http.StatusOK, "%d", count)
 }

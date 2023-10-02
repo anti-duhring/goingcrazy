@@ -1,5 +1,52 @@
-version: '1'
+version: '3.5'
 services:
+  api1:
+    image: mateusvn/goingcrazy:0.1
+    hostname: api1
+    depends_on:
+      - postgres
+    expose:
+      - "80"
+    environment:
+      API_PORT: 80
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: '0.5GB'
+  
+  api2:
+    image: mateusvn/goingcrazy:0.1
+    hostname: api2
+    depends_on:
+      - postgres
+    expose:
+      - "80"
+    environment:
+      API_PORT: 80
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: '0.5GB'
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: '0.5GB'
+
   postgres:
     image: postgres:latest
     environment:
@@ -9,6 +56,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: '1.5GB'
 
 volumes:
   postgres-data:
