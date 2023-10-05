@@ -9,8 +9,7 @@ OS_ARCH=amd64
 default: start
 
 start: 
-	@docker-compose up -d
-	@go run main.go
+	@docker-compose up
 run:
 	@go run main.go
 build:

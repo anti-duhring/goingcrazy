@@ -2,12 +2,14 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/anti-duhring/goingcrazy/schema"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 func CreatePersonHandler(c *gin.Context) {
@@ -45,6 +47,11 @@ func CreatePersonHandler(c *gin.Context) {
 
 	if err := db.Create(&person).Error; err != nil {
 		logger.Errorf("error creating perso: %v", err.Error())
+
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			sendError(c, http.StatusUnprocessableEntity, err.Error())
+			return
+		}
 
 		sendError(c, http.StatusInternalServerError, err.Error())
 		return

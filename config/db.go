@@ -20,7 +20,7 @@ func InitializeDB() (*gorm.DB, error) {
 	}
 
 	dsn := os.Getenv("DATABASE_URL")
-	db, dbError := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, dbError := gorm.Open(postgres.Open(dsn), &gorm.Config{TranslateError: true})
 
 	if dbError != nil {
 		logger.Errorf("Database opening error: %v", dbError)
