@@ -1,7 +1,8 @@
 version: '3.5'
 services:
   api1:
-    image: mateusvn/goingcrazy:0.1
+    build: .
+    # image: mateusvn/goingcrazy:0.1
     hostname: api1
     depends_on:
       - postgres
@@ -17,7 +18,8 @@ services:
           memory: '0.5GB'
   
   api2:
-    image: mateusvn/goingcrazy:0.1
+    build: .
+    # image: mateusvn/goingcrazy:0.1
     hostname: api2
     depends_on:
       - postgres
@@ -39,6 +41,7 @@ services:
     depends_on:
       - api1
       - api2
+      - postgres
     ports:
       - "9999:9999"
     deploy:

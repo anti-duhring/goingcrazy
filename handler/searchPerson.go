@@ -10,6 +10,11 @@ import (
 func SearchPersonHandler(c *gin.Context) {
 	searchTerm := c.Query("t")
 
+	if searchTerm == "" {
+		sendError(c, http.StatusBadRequest, "Search term is required")
+		return
+	}
+
 	people := []schema.Person{}
 	maxPersons := 50
 
