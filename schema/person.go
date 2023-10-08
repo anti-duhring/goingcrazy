@@ -6,8 +6,9 @@ import (
 
 type Person struct {
 	Base
-	Apelido    string         `gorm:"size:32;not null;unique"`
-	Nome       string         `gorm:"size:100;not null"`
-	Nascimento datatypes.Date `gorm:"type:date;not null"`
-	Stack      datatypes.JSON
+	Apelido     string         `gorm:"size:32;not null;unique"`
+	Nome        string         `gorm:"size:100;not null"`
+	SearchIndex string         `gorm:"not null"`
+	Nascimento  datatypes.Date `gorm:"type:date;not null"`
+	Stack       datatypes.JSON
 }

@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/anti-duhring/goingcrazy/schema"
@@ -39,10 +40,11 @@ func CreatePersonHandler(c *gin.Context) {
 	}
 
 	person := schema.Person{
-		Apelido:    request.Apelido,
-		Nome:       request.Nome,
-		Nascimento: datatypes.Date(request.Nascimento.Time),
-		Stack:      stackJSON,
+		Apelido:     request.Apelido,
+		Nome:        request.Nome,
+		Nascimento:  datatypes.Date(request.Nascimento.Time),
+		Stack:       stackJSON,
+		SearchIndex: fmt.Sprintf("%s %s %s", request.Apelido, request.Nome, stackJSON),
 	}
 
 	if err := db.Create(&person).Error; err != nil {
@@ -53,12 +55,12 @@ func CreatePersonHandler(c *gin.Context) {
 			return
 		}
 
-		sendError(c, http.StatusInternalServerError, err.Error())
+		sendWithoutJSON(c, http.StatusInternalServerError)
 		return
 	}
 
 	addLocationToHeader(c, person.ID)
-	sendSuccess(c, http.StatusCreated, "create-person", person)
+	sendWithoutJSON(c, http.StatusCreated)
 }
 
 func addLocationToHeader(c *gin.Context, id uuid.UUID) {

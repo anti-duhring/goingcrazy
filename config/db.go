@@ -31,11 +31,24 @@ func InitializeDB() (*gorm.DB, error) {
 	dbError = db.AutoMigrate(&schema.Person{})
 	logger.Info("Automigrating database...")
 
+	db.Exec(`
+		CREATE EXTENSION IF NOT EXISTS pg_trgm;
+		CREATE INDEX IF NOT EXISTS idx_people_search ON public.people USING gist (search_index public.gist_trgm_ops (siglen='64'));
+	`)
+
 	alreadyMigrated := db.Migrator().HasTable(&schema.Person{})
 	if dbError != nil && !alreadyMigrated {
 		logger.Errorf("Database automigration error: %v", dbError)
 		return nil, dbError
 	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		logger.Errorf("Database connection error: %v", err)
+		return nil, err
+	}
+
+	sqlDB.SetMaxOpenConns(50)
 
 	return db, dbError
 }

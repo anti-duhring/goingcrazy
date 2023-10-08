@@ -26,6 +26,11 @@ func sendSucessWithoutMessage(c *gin.Context, statusCode int, data interface{}) 
 	c.JSON(statusCode, data)
 }
 
+func sendWithoutJSON(c *gin.Context, statusCode int) {
+	c.Header("Content-Type", "application/json")
+	c.JSON(statusCode, nil)
+}
+
 type PersonResponse struct {
 	ID         uuid.UUID      `json:"id"`
 	Apelido    string         `json:"apelido"`

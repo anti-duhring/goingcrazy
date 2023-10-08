@@ -19,18 +19,8 @@ func SearchPersonHandler(c *gin.Context) {
 	maxPersons := 50
 
 	if err := db.Model(&schema.Person{}).Limit(maxPersons).Where(`
-		nome ILIKE CONCAT('%', ?::text, '%') OR
-		apelido ILIKE CONCAT('%', ?::text, '%') OR
-		(
-			stack IS NOT NULL AND
-			jsonb_typeof(stack) = 'array' AND
-			EXISTS (
-				SELECT 1
-				FROM jsonb_array_elements(stack) AS element
-				WHERE element::text ILIKE CONCAT('%', ?::text, '%')
-			)
-		)	
-	`, searchTerm, searchTerm, searchTerm).Find(&people).Error; err != nil {
+		search_index ILIKE CONCAT('%', ?::text, '%')
+	`, searchTerm).Find(&people).Error; err != nil {
 		sendError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
