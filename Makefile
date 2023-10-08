@@ -1,4 +1,4 @@
-.PHONY: default start run build test clean stop
+.PHONY: default start run build dockerbuild test clean stop
 
 # Variables
 APP_NAME=goingcrazy
@@ -13,7 +13,12 @@ start:
 run:
 	@go run main.go
 build:
+	@rm -f $(APP_NAME)
 	@env GOS=$(OS) GOARCH=$(OS_ARCH) go build -o $(APP_NAME) main.go
+dockerbuild:
+	@docker-compose down -v
+	@docker-compose build
+	@docker-compose up
 test:
 	@go test ./ ...
 clean:

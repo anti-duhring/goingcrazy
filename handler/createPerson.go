@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/anti-duhring/goingcrazy/config"
 	"github.com/anti-duhring/goingcrazy/schema"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
-	"gorm.io/gorm"
 )
 
 func CreatePersonHandler(c *gin.Context) {
@@ -30,6 +30,13 @@ func CreatePersonHandler(c *gin.Context) {
 		return
 	}
 
+	_, personExistsErr := cache.GetPerson(c, request.Apelido)
+
+	if personExistsErr == nil {
+		sendWithoutJSON(c, http.StatusUnprocessableEntity)
+		return
+	}
+
 	stackJSON, err := json.Marshal(request.Stack)
 
 	if err != nil {
@@ -46,16 +53,18 @@ func CreatePersonHandler(c *gin.Context) {
 		Stack:       stackJSON,
 		SearchIndex: fmt.Sprintf("%s %s %s", request.Apelido, request.Nome, stackJSON),
 	}
+	person.ID = uuid.New()
 
-	if err := db.Create(&person).Error; err != nil {
-		logger.Errorf("error creating perso: %v", err.Error())
-
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			sendError(c, http.StatusUnprocessableEntity, err.Error())
+	if err := worker.Create(c, person); err != nil {
+		if errors.Is(err, config.ErrNicknameAlreadyExists) {
+			sendWithoutJSON(c, http.StatusUnprocessableEntity)
 			return
 		}
 
-		sendWithoutJSON(c, http.StatusInternalServerError)
+		logger.Errorf("error creating person: %v", err.Error())
+
+		sendWithoutJSON(c, http.StatusUnprocessableEntity)
+
 		return
 	}
 

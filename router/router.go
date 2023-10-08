@@ -18,5 +18,5 @@ func Initialize() {
 	})
 
 	port := os.Getenv("API_PORT")
-	r.Run(":" + port)
+	go r.Run(":" + port)
 }

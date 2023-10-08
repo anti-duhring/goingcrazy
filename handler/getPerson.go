@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/anti-duhring/goingcrazy/schema"
@@ -16,20 +15,27 @@ func GetPersonHandler(c *gin.Context) {
 		return
 	}
 
-	person := schema.Person{}
+	_, personExistsErr := cache.GetPerson(c, id)
 
-	if err := db.Model(&schema.Person{}).Where("id = ?", id).First(&person).Error; err != nil {
-		sendError(c, http.StatusNotFound, fmt.Sprintf("person with id '%s' not found", id))
+	if personExistsErr == nil {
+		sendWithoutJSON(c, http.StatusOK)
 		return
 	}
 
-	personResponse := PersonResponse{
-		ID:         person.ID,
-		Apelido:    person.Apelido,
-		Nome:       person.Nome,
-		Nascimento: person.Nascimento,
-		Stack:      person.Stack,
+	person := schema.Person{}
+
+	if err := db.Model(&schema.Person{}).Select("id").Where("id = ?", id).First(&person).Error; err != nil {
+		sendWithoutJSON(c, http.StatusNotFound)
+		return
 	}
 
-	sendSucessWithoutMessage(c, http.StatusOK, personResponse)
+	// personResponse := PersonResponse{
+	// 	ID:         person.ID,
+	// 	Apelido:    person.Apelido,
+	// 	Nome:       person.Nome,
+	// 	Nascimento: person.Nascimento,
+	// 	Stack:      person.Stack,
+	// }
+
+	sendWithoutJSON(c, http.StatusOK)
 }

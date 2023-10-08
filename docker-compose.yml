@@ -8,16 +8,20 @@ services:
     hostname: api1
     depends_on:
       - postgres
+      - redis
     restart: on-failure
+    networks:
+      - rinha-network
     expose:
       - 80
     environment:
       API_PORT: 80
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      REDIS_URL: redis://redis:6379/0
     deploy:
       resources:
         limits:
-          cpus: '0.2'
+          cpus: '0.1'
           memory: '0.5GB'
   
   api2:
@@ -30,14 +34,18 @@ services:
       - 80
     depends_on:
       - postgres
+      - redis
     restart: on-failure
+    networks:
+      - rinha-network
     environment:
       API_PORT: 80
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      REDIS_URL: redis://redis:6379/0
     deploy:
       resources:
         limits:
-          cpus: '0.2'
+          cpus: '0.15'
           memory: '0.5GB'
 
   nginx:
@@ -49,29 +57,50 @@ services:
         condition: service_started
       api2:
         condition: service_started
+    networks:
+      - rinha-network
     ports:
-      - "9999:9999"
+      - 9999:9999
     deploy:
       resources:
         limits:
           cpus: '0.15'
-          memory: '0.5GB'
+          memory: '0.4GB'
 
   postgres:
-    image: postgres:latest
+    image: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    command: postgres -c 'max_connections=350'
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: postgres -c 'max_connections=300'
+    networks:
+      - rinha-network
     ports:
       - 5432:5432
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: '1.1'
           memory: '1.5GB'
+  
+  redis:
+    image: redis:latest
+    hostname: redis
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save "" --appendonly no --maxclients 20000
+    networks:
+      - rinha-network
+    deploy:
+      resources: 
+        limits:
+          cpus: '0.05'
+          memory: '0.1GB'
 
-volumes:
-  postgres-data:
+networks:
+  rinha-network:
+    driver: bridge
+

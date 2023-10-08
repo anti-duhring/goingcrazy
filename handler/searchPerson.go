@@ -11,19 +11,19 @@ func SearchPersonHandler(c *gin.Context) {
 	searchTerm := c.Query("t")
 
 	if searchTerm == "" {
-		sendError(c, http.StatusBadRequest, "Search term is required")
+		sendWithoutJSON(c, http.StatusBadRequest)
 		return
 	}
 
 	people := []schema.Person{}
 	maxPersons := 50
 
-	if err := db.Model(&schema.Person{}).Limit(maxPersons).Where(`
+	if err := db.Model(&schema.Person{}).Select("id").Limit(maxPersons).Where(`
 		search_index ILIKE CONCAT('%', ?::text, '%')
 	`, searchTerm).Find(&people).Error; err != nil {
-		sendError(c, http.StatusInternalServerError, err.Error())
+		sendWithoutJSON(c, http.StatusOK)
 		return
 	}
 
-	sendSucessWithoutMessage(c, http.StatusOK, people)
+	sendWithoutJSON(c, http.StatusOK)
 }

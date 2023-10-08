@@ -28,13 +28,13 @@ func InitializeDB() (*gorm.DB, error) {
 		return nil, dbError
 	}
 
-	dbError = db.AutoMigrate(&schema.Person{})
-	logger.Info("Automigrating database...")
+	// dbError = db.AutoMigrate(&schema.Person{})
+	// logger.Info("Automigrating database...")
 
-	db.Exec(`
-		CREATE EXTENSION IF NOT EXISTS pg_trgm;
-		CREATE INDEX IF NOT EXISTS idx_people_search ON public.people USING gist (search_index public.gist_trgm_ops (siglen='64'));
-	`)
+	// db.Exec(`
+	// 	CREATE EXTENSION IF NOT EXISTS pg_trgm;
+	// 	CREATE INDEX IF NOT EXISTS idx_people_search ON public.people USING gist (search_index public.gist_trgm_ops (siglen='64'));
+	// `)
 
 	alreadyMigrated := db.Migrator().HasTable(&schema.Person{})
 	if dbError != nil && !alreadyMigrated {
