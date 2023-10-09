@@ -3,6 +3,8 @@ package config
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/anti-duhring/goingcrazy/schema"
@@ -33,10 +35,6 @@ func NewWorker(DB *gorm.DB, Cache *redis.Client) *Worker {
 }
 
 func (w *Worker) Create(ctx context.Context, person schema.Person) error {
-	if v, _ := w.Cache.Get(ctx, person.Apelido).Result(); v != "" {
-		return ErrNicknameAlreadyExists
-	}
-
 	j, err := json.Marshal(person)
 	if err != nil {
 		return err
@@ -57,7 +55,7 @@ func (w *Worker) Create(ctx context.Context, person schema.Person) error {
 }
 
 func (w *Worker) Insert(persons []schema.Person) error {
-	if err := w.DB.Create(&persons).Error; err != nil {
+	if err := w.DB.Table("people").Create(&persons).Error; err != nil {
 		logger.Errorf("error inserting person: %v", err)
 		return err
 	}
@@ -77,6 +75,10 @@ func RunWorker(chPeople chan schema.Person, chanExit chan struct{}, batch int) {
 		select {
 		case p, ok := <-chPeople:
 			if p.ID != uuid.Nil {
+				p.SearchIndex = fmt.Sprintf("%s %s %s", p.Nome, p.Apelido, p.Stack)
+				stackArrayLiteral := "{" + strings.Join(p.Stack, ",") + "}"
+
+				p.Stack = []string{stackArrayLiteral}
 				people = append(people, p)
 				i++
 

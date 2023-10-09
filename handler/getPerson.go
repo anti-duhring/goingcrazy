@@ -24,7 +24,7 @@ func GetPersonHandler(c *gin.Context) {
 
 	person := schema.Person{}
 
-	if err := db.Model(&schema.Person{}).Select("id").Where("id = ?", id).First(&person).Error; err != nil {
+	if err := db.Table("people").Select("id").Where("id = ?", id).First(&person).Error; err != nil {
 		sendWithoutJSON(c, http.StatusNotFound)
 		return
 	}

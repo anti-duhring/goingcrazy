@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 
-	"github.com/anti-duhring/goingcrazy/schema"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -35,12 +34,6 @@ func InitializeDB() (*gorm.DB, error) {
 	// 	CREATE EXTENSION IF NOT EXISTS pg_trgm;
 	// 	CREATE INDEX IF NOT EXISTS idx_people_search ON public.people USING gist (search_index public.gist_trgm_ops (siglen='64'));
 	// `)
-
-	alreadyMigrated := db.Migrator().HasTable(&schema.Person{})
-	if dbError != nil && !alreadyMigrated {
-		logger.Errorf("Database automigration error: %v", dbError)
-		return nil, dbError
-	}
 
 	sqlDB, err := db.DB()
 	if err != nil {

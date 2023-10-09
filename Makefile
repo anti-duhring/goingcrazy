@@ -16,6 +16,8 @@ build:
 	@rm -f $(APP_NAME)
 	@env GOS=$(OS) GOARCH=$(OS_ARCH) go build -o $(APP_NAME) main.go
 dockerbuild:
+	@rm -f $(APP_NAME)
+	@env GOS=$(OS) GOARCH=$(OS_ARCH) go build -o $(APP_NAME) main.go
 	@docker-compose down -v
 	@docker-compose build
 	@docker-compose up

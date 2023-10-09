@@ -48,6 +48,7 @@ func (c *Cache) GetPerson(ctx context.Context, key string) (schema.Person, error
 	}
 
 	if val != "" {
+
 		err := json.Unmarshal([]byte(val), &person)
 
 		if err == nil {

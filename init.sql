@@ -8,8 +8,8 @@ CREATE TABLE "people" (
     "apelido" varchar(32) NOT NULL UNIQUE,
     "nome" varchar(100) NOT NULL,
     "search_index" text NOT NULL,
-    "nascimento" date NOT NULL,
-    "stack" JSONB,
+    "nascimento" text NOT NULL,
+    "stack" VARCHAR[] null default '{}',
     PRIMARY KEY ("id")
 );
 
