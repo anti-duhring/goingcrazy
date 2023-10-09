@@ -21,11 +21,6 @@ func sendSuccess(c *gin.Context, statusCode int, op string, data interface{}) {
 	})
 }
 
-func sendSucessWithoutMessage(c *gin.Context, statusCode int, data interface{}) {
-	c.Header("Content-Type", "application/json")
-	c.JSON(statusCode, data)
-}
-
 func sendWithoutJSON(c *gin.Context, statusCode int) {
 	c.Header("Content-Type", "application/json")
 	c.JSON(statusCode, nil)

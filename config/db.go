@@ -41,7 +41,7 @@ func InitializeDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	sqlDB.SetMaxOpenConns(50)
+	sqlDB.SetMaxOpenConns(15)
 
 	return db, dbError
 }
